@@ -1,0 +1,10 @@
+{
+    "name": "raspberry",
+    "private": true,
+    "scripts": {
+      "dev": "cargo run",
+      "build": "cargo build",
+      "start": "cargo run"
+    }
+  }
+  

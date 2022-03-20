@@ -1,7 +1,3 @@
-# Turborepo starter with NPM
-
-This is an official starter turborepo.
-
 ## What's inside?
 
 This turborepo uses [NPM](https://www.npmjs.com/) as a package manager. It includes the following packages/apps:
@@ -33,7 +29,7 @@ This repository is used in the `npx create-turbo@latest` command, and selected w
 To build all apps and packages, run the following command:
 
 ```
-cd my-turborepo
+cd flettex
 npm run build
 ```
 
@@ -53,7 +49,7 @@ Turborepo can use a technique known as [Remote Caching (Beta)](https://turborepo
 By default, Turborepo will cache locally. To enable Remote Caching (Beta) you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup), then enter the following commands:
 
 ```
-cd my-turborepo
+cd flettex
 npx turbo login
 ```
 
