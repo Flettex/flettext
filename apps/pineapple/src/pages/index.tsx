@@ -1,13 +1,12 @@
-import React from "react";
+import {useEffect, useState} from "react";
 import type { NextPage } from "next";
-import { Flex } from "@chakra-ui/react";
-import Image from "next/image";
-import faviconSvg from "/public/favicon.svg";
+
+import { Center } from "@chakra-ui/react";
 
 const Display: NextPage = () => {
-  const [token, setToken] = React.useState<string>("");
-  React.useEffect((): any => {
-    const tok = localStorage.getItem("token") || "testvalue123";
+  const [token, setToken] = useState<string>("");
+  useEffect((): any => {
+    const tok = localStorage.getItem("token") || "Not found";
     if (tok) setToken(tok);
     localStorage.removeItem("token");
     window.addEventListener("beforeunload", () => {
@@ -16,10 +15,9 @@ const Display: NextPage = () => {
   }, []);
   return (
     <>
-      {token}
-      <Flex alignItems="center" justifyContent="center">
-        <Image src={faviconSvg} alt="" />
-      </Flex>
+      <Center h="100vh">
+        {token}
+      </Center>
     </>
   );
 };
