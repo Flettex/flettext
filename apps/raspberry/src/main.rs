@@ -5,6 +5,7 @@ use std::{
     },
     time::Instant,
     // string::String
+    env
 };
 
 use actix::*;
@@ -67,7 +68,13 @@ async fn main() -> std::io::Result<()> {
 
     let server = server::ChatServer::new(app_state.clone()).start();
 
-    log::info!("starting HTTP server at http://localhost:8080");
+    let is_dev;
+    match env::var("RAILWAY_STATIC_URL") {
+        Ok(_) => is_dev = false,
+        Err(_) => is_dev = true,
+    }
+
+    log::info!("{:?}", format!("starting HTTP server at {:?}", if is_dev {"http://localhost:8080"} else {"production url"}));
 
     HttpServer::new(move || {
         App::new()
@@ -80,7 +87,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
     })
     .workers(2)
-    .bind(("127.0.0.1", 8080))?
+    .bind((if is_dev {"127.0.0.1"} else {"0.0.0.0"}, 8080))?
     .run()
     .await
 }
