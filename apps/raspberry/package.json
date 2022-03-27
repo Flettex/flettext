@@ -2,7 +2,7 @@
     "name": "raspberry",
     "private": true,
     "scripts": {
-      "dev": "cargo run",
+      "dev": "cargo watch -x run",
       "build": "cargo build",
       "start": "cargo run"
     }
