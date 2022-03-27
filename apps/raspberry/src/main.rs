@@ -12,16 +12,18 @@ use actix_web::{
     middleware::Logger, web, App, Error, HttpRequest, HttpResponse, HttpServer, Responder,
 };
 use actix_web_actors::ws;
-use actix_files::{NamedFile};
+// use actix_files::{NamedFile};
 
 // use serde::{Deserialize};
 // use serde_json::Value;
 
 mod server;
+mod html;
 mod session;
 
 async fn index() -> impl Responder {
-    NamedFile::open_async("./test/index.html").await.unwrap()
+    HttpResponse::Ok().content_type("text/html").body(html::htmlStr())
+    // NamedFile::open_async("./test/index.html").await.unwrap()
 }
 
 async fn message_route(
