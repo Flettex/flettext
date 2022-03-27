@@ -22,7 +22,7 @@ mod html;
 mod session;
 
 async fn index() -> impl Responder {
-    HttpResponse::Ok().content_type("text/html").body(html::htmlStr())
+    HttpResponse::Ok().content_type("text/html").body(html::html_str())
     // NamedFile::open_async("./test/index.html").await.unwrap()
 }
 
@@ -80,7 +80,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
     })
     .workers(2)
-    .bind(("127.0.0.1", 8080))?
+    .bind(("0.0.0.0", 8080))?
     .run()
     .await
 }

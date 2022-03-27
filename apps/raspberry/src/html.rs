@@ -1,6 +1,6 @@
 
 
-pub fn htmlStr() -> std::string::String {
+pub fn html_str() -> std::string::String {
     r#"
         <!DOCTYPE html>
         <html>
