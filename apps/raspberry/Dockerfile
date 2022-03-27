@@ -9,9 +9,9 @@ FROM chef AS builder
 COPY --from=planner /raspberry/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
 COPY . .
-RUN cargo build --release --bin raspberry
+RUN cargo build --release --bin raspberry-backend-app
 
 FROM debian:bullseye-slim AS runtime
 WORKDIR /raspberry
-COPY --from=builder /raspberry/target/release/raspberry /usr/local/bin
+COPY --from=builder /raspberry/target/release/raspberry-backend-app /usr/local/bin
 ENTRYPOINT ["/usr/local/bin/raspberry"]
