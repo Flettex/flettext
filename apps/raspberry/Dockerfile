@@ -14,4 +14,5 @@ RUN cargo build --release --bin raspberry-backend-app
 FROM debian:bullseye-slim AS runtime
 WORKDIR /raspberry
 COPY --from=builder /raspberry/target/release/raspberry-backend-app /usr/local/bin
+EXPOSE 8080
 ENTRYPOINT ["/usr/local/bin/raspberry-backend-app"]
