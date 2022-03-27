@@ -68,6 +68,7 @@ model Guild {
   name      String    @db.VarChar(64)
   createdAt DateTime  @default(now())
   members   Member[]
+  roles     Role[]
   invite    String    @unique @default(uuid())
 
   @@index([ownerId])
@@ -116,10 +117,14 @@ model Message {
 }
 
 model Role {
-  id         Int      @id @default(autoincrement()) @db.UnsignedInt
-  permission Int      @db.UnsignedInt
-  name       String   @db.VarChar(32)
-  createdAt  DateTime @default(now())
+  id          Int      @id @default(autoincrement()) @db.UnsignedInt
+  permission  Int      @db.UnsignedInt
+  guild       Guild    @relation(fields: [guildId], references: [id])
+  guildId     Int      @db.UnsignedInt
+  name        String   @db.VarChar(32)
+  createdAt   DateTime @default(now())
+  display     Boolean  @default(true)
+  mentionable Boolean  @default(false)
 }
 
 enum RelationshipType {
