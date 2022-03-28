@@ -22,6 +22,10 @@ mod server;
 mod html;
 mod session;
 
+async fn health_check() -> impl Responder {
+    HttpResponse::Ok()
+}
+
 async fn index() -> impl Responder {
     HttpResponse::Ok().content_type("text/html").body(html::html_str())
     // NamedFile::open_async("./test/index.html").await.unwrap()
@@ -84,6 +88,7 @@ async fn main() -> std::io::Result<()> {
             .route("/", web::post().to(message_route))
             .route("/count", web::get().to(get_count))
             .route("/ws", web::get().to(chat_route))
+            .route("/healthcheck", web::get().to(health_check))
             .wrap(Logger::default())
     })
     .workers(2)
