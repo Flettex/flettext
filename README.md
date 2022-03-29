@@ -6,7 +6,7 @@ This turborepo uses [NPM](https://www.npmjs.com/) as a package manager. It inclu
 
 - `durian`: a [Docusaurus](https://docusaurus.io) app
 - `pineapple`: a [Next.js](https://nextjs.org) app
-- `raspberry`: a [Rust](http://rust-lang.org) app
+- `raspberry`: an [Actix-web](https://actix.rs/) app built with [Rust](http://rust-lang.org)
 - `ui`: a stub React component library shared by both `durian` and `pineapple` applications
 - `config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
 - `tsconfig`: `tsconfig.json`s used throughout the monorepo
