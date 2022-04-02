@@ -148,6 +148,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                     } else {
                         m.to_owned()
                     };
+                    log::info!("{} {}", msg, self.id);
                     self.addr.do_send(server::ClientMessage {
                         id: self.id,
                         msg,

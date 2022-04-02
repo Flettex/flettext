@@ -62,7 +62,8 @@ pub fn html_str() -> std::string::String {
             <h1>Chat!</h1>
 
             <div>
-            <button onclick="fetch('/', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({type: 'MessageCreate', client_id: 0, data: { content: 'Hello' }, room: 'Main'})})">Send Hi</button>
+            <!-- <button onclick="fetch('/', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({type: 'MessageCreate', client_id: 0, data: { content: 'Hello' }, room: 'Main'})})">Send Hi</button> -->
+            <button onclick="socket.send('hi')">Send Hi</button>
             <button id="connect">Connect</button>
             <span>Status:</span>
             <span id="status">disconnected</span>

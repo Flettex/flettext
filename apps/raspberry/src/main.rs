@@ -13,10 +13,6 @@ use actix_web::{
     middleware::Logger, web, App, Error, HttpRequest, HttpResponse, HttpServer, Responder,
 };
 use actix_web_actors::ws;
-// use actix_files::{NamedFile};
-
-// use serde::{Deserialize};
-// use serde_json::Value;
 
 mod server;
 mod html;

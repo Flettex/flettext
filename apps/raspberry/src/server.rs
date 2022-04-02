@@ -73,7 +73,7 @@ pub struct Join {
 #[derive(Debug)]
 pub struct ChatServer {
     sessions: HashMap<usize, Recipient<Message>>,
-    pub rooms: HashMap<String, HashSet<usize>>,
+    rooms: HashMap<String, HashSet<usize>>,
     rng: ThreadRng,
     visitor_count: Arc<AtomicUsize>,
 }
@@ -98,7 +98,7 @@ impl ChatServer {
             for id in sessions {
                 if *id != skip_id {
                     if let Some(addr) = self.sessions.get(id) {
-                        let _ = addr.do_send(Message{data: MessageTypes::MessageCreate(MessageType1{content: message.to_owned()})});
+                        addr.do_send(Message{data: MessageTypes::MessageCreate(MessageType1{content: message.to_owned()})});
                     }
                 }
             }
@@ -109,7 +109,7 @@ impl ChatServer {
         if let Some(sessions) = self.rooms.get(room) {
             for id in sessions {
                 if let Some(addr) = self.sessions.get(id) {
-                    let _ = addr.do_send(Message{data: data.clone()});
+                    addr.do_send(Message{data: data.clone()});
                 }
             }
         }

@@ -19,7 +19,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   if (!ctx.req.cookies._rftcp) {
     return {
       redirect: {
-        destination: "/chat/login",
+        destination: "/login",
         permanent: false,
       },
     };
