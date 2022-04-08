@@ -1,6 +1,6 @@
 import { Box, Divider, Flex, Text } from "@chakra-ui/react";
-import Image from "next/image";
-import cakeLie from "../../public/cakeLie.jpg";
+// import Image from "next/image";
+// import cakeLie from "../../public/cakeLie.jpg";
 
 export default function ErrorPage() {
   return (
