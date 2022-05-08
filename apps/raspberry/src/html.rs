@@ -1,4 +1,4 @@
-
+// index.html file will not work in production if it doesn't exist... so I decided to include this in rust's BUILD.
 
 pub fn html_str() -> std::string::String {
     r#"

@@ -88,6 +88,8 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
             Ok(msg) => msg,
         };
 
+        // TODO: Decode JSON
+        let val: serde_json::Value = serde_json::from_str(msg);
         log::debug!("WEBSOCKET MESSAGE: {:?}", msg);
         match msg {
             ws::Message::Ping(msg) => {

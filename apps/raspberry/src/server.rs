@@ -30,14 +30,23 @@ pub struct Disconnect {
 }
 
 #[derive(Serialize, Deserialize, Clone)]
-pub struct MessageType1 {
-  content: String,
+pub struct MessageCreateType {
+    content: String,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct MessageUpateType {
+    id: usize,
+    content: String,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(tag = "type", content = "data")]
 pub enum MessageTypes {
-  MessageCreate(MessageType1)
+    #[serde(rename = "MESSAGE_CREATE")]
+    MessageCreate(MessageCreateType)
+    #[serde(rename = "MESSAGE_UPDATE")]
+    MessageUpate(MessageUpateType)
 }
 
 #[derive(Message, Serialize, Deserialize)]
@@ -81,6 +90,7 @@ pub struct ChatServer {
 impl ChatServer {
     pub fn new(visitor_count: Arc<AtomicUsize>) -> ChatServer {
         let mut rooms = HashMap::new();
+        // global chat ig
         rooms.insert("Main".to_owned(), HashSet::new());
 
         ChatServer {
