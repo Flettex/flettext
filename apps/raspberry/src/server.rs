@@ -43,9 +43,7 @@ pub struct MessageUpateType {
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(tag = "type", content = "data")]
 pub enum MessageTypes {
-    #[serde(rename = "MESSAGE_CREATE")]
-    MessageCreate(MessageCreateType)
-    #[serde(rename = "MESSAGE_UPDATE")]
+    MessageCreate(MessageCreateType),
     MessageUpate(MessageUpateType)
 }
 
@@ -108,7 +106,7 @@ impl ChatServer {
             for id in sessions {
                 if *id != skip_id {
                     if let Some(addr) = self.sessions.get(id) {
-                        addr.do_send(Message{data: MessageTypes::MessageCreate(MessageType1{content: message.to_owned()})});
+                        addr.do_send(Message{data: MessageTypes::MessageCreate(MessageCreateType{content: message.to_owned()})});
                     }
                 }
             }

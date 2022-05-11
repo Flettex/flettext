@@ -5,11 +5,34 @@ use actix_web_actors::ws;
 
 use crate::server;
 
+use serde::{Serialize, Deserialize};
 use serde_json::{json};
+use std::fmt;
 
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
 
 const CLIENT_TIMEOUT: Duration = Duration::from_secs(10);
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct WsMessageCreate {
+    content: String
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+#[serde(tag = "type", content = "data")]
+pub enum WsReceiveTypes {
+    MessageCreate(WsMessageCreate),
+    Null
+}
+
+impl fmt::Display for WsReceiveTypes {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            WsReceiveTypes::MessageCreate(msg) => write!(f, "{}", msg.content),
+            WsReceiveTypes::Null => write!(f, "{}", "null")
+        }
+    }
+}
 
 #[derive(Debug)]
 pub struct WsChatSession {
@@ -39,6 +62,10 @@ impl WsChatSession {
 
             ctx.ping(b"");
         });
+    }
+
+    fn decode_json(&self, s: &str) -> serde_json::Result<WsReceiveTypes> {
+        serde_json::from_str(s)
     }
 }
 
@@ -88,8 +115,6 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
             Ok(msg) => msg,
         };
 
-        // TODO: Decode JSON
-        let val: serde_json::Value = serde_json::from_str(msg);
         log::debug!("WEBSOCKET MESSAGE: {:?}", msg);
         match msg {
             ws::Message::Ping(msg) => {
@@ -100,6 +125,14 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                 self.hb = Instant::now();
             }
             ws::Message::Text(text) => {
+                let val = match self.decode_json(text.trim()) {
+                    Err(err) => {
+                        println!("{}", err);
+                        WsReceiveTypes::Null
+                    }
+                    Ok(val) => val,
+                };
+                println!("{}", val);
                 let m = text.trim();
                 if m.starts_with('/') {
                     let v: Vec<&str> = m.splitn(2, ' ').collect();
