@@ -1,6 +1,7 @@
 use std::time::{Duration, Instant};
 
 use actix::prelude::*;
+// use actix_web::rt::time::timeout;
 use actix_web_actors::ws;
 
 use crate::server;
@@ -9,19 +10,54 @@ use serde::{Serialize, Deserialize};
 use serde_json::{json};
 use std::fmt;
 
+fn format_m(content: &str) -> String {
+    json!({
+        "data": {
+            "content": content
+        },
+        "type": "MessageCreate"
+    }).to_string()
+}
+
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
 
 const CLIENT_TIMEOUT: Duration = Duration::from_secs(10);
 
 #[derive(Serialize, Deserialize, Clone)]
-pub struct WsMessageCreate {
+struct WsMessageCreate {
     content: String
 }
 
 #[derive(Serialize, Deserialize, Clone)]
+struct WsMessageUpdate {
+    id: usize,
+    content: String
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+struct WsDevice {
+    os: String,
+    device: String,
+    browser: String
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+struct WsAuthMsg {
+    token: String,
+    cred: WsDevice
+}
+
+#[derive(Serialize, Deserialize, Clone)]
 #[serde(tag = "type", content = "data")]
-pub enum WsReceiveTypes {
+enum WsReceiveTypes {
+    // {"type":"MessageUpdate", "data":{"content":"",id:1}}
+    MessageUpdate(WsMessageUpdate),
+    // {"type":"MessageCreate", "data":{"content":""}}
     MessageCreate(WsMessageCreate),
+    // {"type":"Auth", "data":{"token":"123","cred":{"os":"1", "device":"2", "browser":"3"}}}
+    Auth(WsAuthMsg),
+    // {"type":"Null"}
+    // used for testing purposes
     Null
 }
 
@@ -29,7 +65,9 @@ impl fmt::Display for WsReceiveTypes {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             WsReceiveTypes::MessageCreate(msg) => write!(f, "{}", msg.content),
-            WsReceiveTypes::Null => write!(f, "{}", "null")
+            WsReceiveTypes::MessageUpdate(msg) => write!(f, "Updating {} to {}", msg.id, msg.content),
+            WsReceiveTypes::Auth(msg) => write!(f, "{{\"token\":\"{t}\",\"cred\":{{\"os\":\"{os}\",\"browser\":\"{browser}\",\"device\":\"{device}\"}}}}", t=msg.token, os=msg.cred.os, browser=msg.cred.browser, device=msg.cred.device),
+            WsReceiveTypes::Null => write!(f, "{}", "null"),
         }
     }
 }
@@ -45,6 +83,10 @@ pub struct WsChatSession {
     pub name: Option<String>,
 
     pub addr: Addr<server::ChatServer>,
+
+    pub authenticated: bool,
+
+    pub handle: Option<SpawnHandle>
 }
 
 impl WsChatSession {
@@ -75,6 +117,14 @@ impl Actor for WsChatSession {
     fn started(&mut self, ctx: &mut Self::Context) {
         self.hb(ctx);
         
+        self.handle = Some(ctx.run_later(Duration::from_secs(30), |_, ctx| {
+            ctx.close(Some(ws::CloseReason{
+                code: ws::CloseCode::from(4001),
+                description: Some("Authentication payload was not provided on time.".to_string())
+            }));
+            ctx.stop();
+        }));
+
         let addr = ctx.address();
         self.addr
             .send(server::Connect {
@@ -134,7 +184,21 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                 };
                 println!("{}", val);
                 let m = text.trim();
-                if m.starts_with('/') {
+                // migrate to JUST a match
+                if !self.authenticated {
+                    match val {
+                        WsReceiveTypes::Auth(_) => {
+                            match self.handle {
+                                Some(h) => {
+                                    ctx.cancel_future(h);
+                                }
+                                None => ()
+                            }
+                            self.authenticated = true;
+                        }
+                        _ => println!("Not authenticated"),
+                    }
+                } else if m.starts_with('/') {
                     let v: Vec<&str> = m.splitn(2, ' ').collect();
                     match v[0] {
                         "/list" => {
@@ -146,7 +210,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                                     match res {
                                         Ok(rooms) => {
                                             for room in rooms {
-                                                ctx.text(room);
+                                                ctx.text(format_m(&room));
                                             }
                                         }
                                         _ => println!("Something is wrong"),
@@ -163,19 +227,19 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                                     name: self.room.clone(),
                                 });
 
-                                ctx.text("joined");
+                                ctx.text(format_m("joined"));
                             } else {
-                                ctx.text("!!! room name is required");
+                                ctx.text(format_m("!!! room name is required"));
                             }
                         }
                         "/name" => {
                             if v.len() == 2 {
                                 self.name = Some(v[1].to_owned());
                             } else {
-                                ctx.text("!!! name is required");
+                                ctx.text(format_m("!!! name is required"));
                             }
                         }
-                        _ => ctx.text(format!("!!! unknown command: {:?}", m)),
+                        _ => ctx.text(format_m(&format!("!!! unknown command: {:?}", m))),
                     }
                 } else {
                     let msg = if let Some(ref name) = self.name {

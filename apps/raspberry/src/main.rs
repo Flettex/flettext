@@ -49,6 +49,8 @@ async fn chat_route(
             room: "Main".to_owned(),
             name: None,
             addr: srv.get_ref().clone(),
+            authenticated: false,
+            handle: None
         },
         &req,
         stream,

@@ -135,53 +135,54 @@ pub fn html_str() -> std::string::String {
                 socket = new WebSocket(wsUri)
 
                 socket.onopen = () => {
-                log('Connected')
-                updateConnectionStatus()
+                    log('Connected')
+                    updateConnectionStatus()
                 }
 
                 socket.onmessage = (ev) => {
-                console.log(ev);
-                const event = JSON.parse(ev.data);
-                log('Received: ' + event.data.content, 'message')
+                    console.log(ev);
+                    const event = JSON.parse(ev.data);
+                    log('Received: ' + event.data.content, 'message')
                 }
 
-                socket.onclose = () => {
-                log('Disconnected')
-                socket = null
-                updateConnectionStatus()
+                socket.onclose = (ev) => {
+                    log('Disconnected')
+                    socket = null
+                    console.log(ev.code, ev.reason)
+                    updateConnectionStatus()
                 }
             }
 
             function disconnect() {
                 if (socket) {
-                log('Disconnecting...')
-                socket.close()
-                socket = null
+                    log('Disconnecting...')
+                    socket.close()
+                    socket = null
 
-                updateConnectionStatus()
+                    updateConnectionStatus()
                 }
             }
 
             function updateConnectionStatus() {
                 if (socket) {
-                $status.style.backgroundColor = 'transparent'
-                $status.style.color = 'green'
-                $status.textContent = `connected`
-                $connectButton.innerHTML = 'Disconnect'
-                $input.focus()
-                } else {
-                $status.style.backgroundColor = 'red'
-                $status.style.color = 'white'
-                $status.textContent = 'disconnected'
-                $connectButton.textContent = 'Connect'
+                    $status.style.backgroundColor = 'transparent'
+                    $status.style.color = 'green'
+                    $status.textContent = `connected`
+                    $connectButton.innerHTML = 'Disconnect'
+                    $input.focus()
+                    } else {
+                    $status.style.backgroundColor = 'red'
+                    $status.style.color = 'white'
+                    $status.textContent = 'disconnected'
+                    $connectButton.textContent = 'Connect'
                 }
             }
 
             $connectButton.addEventListener('click', () => {
                 if (socket) {
-                disconnect()
+                    disconnect()
                 } else {
-                connect()
+                    connect()
                 }
 
                 updateConnectionStatus()
