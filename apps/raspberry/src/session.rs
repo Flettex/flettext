@@ -1,7 +1,6 @@
 use std::time::{Duration, Instant};
 
 use actix::prelude::*;
-// use actix_web::rt::time::timeout;
 use actix_web_actors::ws;
 
 use crate::server;
@@ -156,6 +155,7 @@ impl Handler<server::Message> for WsChatSession {
 }
 
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
+
     fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
         let msg = match msg {
             Err(_) => {
@@ -184,75 +184,92 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                 };
                 println!("{}", val);
                 let m = text.trim();
-                // migrate to JUST a match
-                if !self.authenticated {
-                    match val {
-                        WsReceiveTypes::Auth(_) => {
+                match val {
+                    WsReceiveTypes::Auth(_) => {
+                        if !self.authenticated {
                             match self.handle {
                                 Some(h) => {
                                     ctx.cancel_future(h);
                                 }
                                 None => ()
-                            }
+                            };
                             self.authenticated = true;
                         }
-                        _ => println!("Not authenticated"),
                     }
-                } else if m.starts_with('/') {
-                    let v: Vec<&str> = m.splitn(2, ' ').collect();
-                    match v[0] {
-                        "/list" => {
-                            println!("List rooms");
-                            self.addr
-                                .send(server::ListRooms)
-                                .into_actor(self)
-                                .then(|res, _, ctx| {
-                                    match res {
-                                        Ok(rooms) => {
-                                            for room in rooms {
-                                                ctx.text(format_m(&room));
+                    WsReceiveTypes::MessageCreate(m) => {
+                        let msg = if let Some(ref name) = self.name {
+                            format!("{}: {}", name, m.content)
+                        } else {
+                            m.content.to_owned()
+                        };
+                        log::info!("{} {}", msg, self.id);
+                        self.addr.do_send(server::ClientMessage {
+                            id: self.id,
+                            msg,
+                            room: self.room.clone(),
+                        })
+                    }
+                    WsReceiveTypes::MessageUpdate(_) => {
+                        // update msg
+                    }
+                    WsReceiveTypes::Null => {
+                        if m.starts_with('/') {
+                            let v: Vec<&str> = m.splitn(2, ' ').collect();
+                            match v[0] {
+                                "/list" => {
+                                    println!("List rooms");
+                                    self.addr
+                                        .send(server::ListRooms)
+                                        .into_actor(self)
+                                        .then(|res, _, ctx| {
+                                            match res {
+                                                Ok(rooms) => {
+                                                    for room in rooms {
+                                                        ctx.text(format_m(&room));
+                                                    }
+                                                }
+                                                _ => println!("Something is wrong"),
                                             }
-                                        }
-                                        _ => println!("Something is wrong"),
+                                            fut::ready(())
+                                        })
+                                        .wait(ctx)
+                                }
+                                "/join" => {
+                                    if v.len() == 2 {
+                                        self.room = v[1].to_owned();
+                                        self.addr.do_send(server::Join {
+                                            id: self.id,
+                                            name: self.room.clone(),
+                                        });
+        
+                                        ctx.text(format_m("joined"));
+                                    } else {
+                                        ctx.text(format_m("!!! room name is required"));
                                     }
-                                    fut::ready(())
-                                })
-                                .wait(ctx)
-                        }
-                        "/join" => {
-                            if v.len() == 2 {
-                                self.room = v[1].to_owned();
-                                self.addr.do_send(server::Join {
-                                    id: self.id,
-                                    name: self.room.clone(),
-                                });
-
-                                ctx.text(format_m("joined"));
-                            } else {
-                                ctx.text(format_m("!!! room name is required"));
+                                }
+                                "/name" => {
+                                    if v.len() == 2 {
+                                        self.name = Some(v[1].to_owned());
+                                    } else {
+                                        ctx.text(format_m("!!! name is required"));
+                                    }
+                                }
+                                _ => ctx.text(format_m(&format!("!!! unknown command: {:?}", m))),
                             }
-                        }
-                        "/name" => {
-                            if v.len() == 2 {
-                                self.name = Some(v[1].to_owned());
+                        } else {
+                            let msg = if let Some(ref name) = self.name {
+                                format!("{}: {}", name, m)
                             } else {
-                                ctx.text(format_m("!!! name is required"));
-                            }
+                                m.to_owned()
+                            };
+                            log::info!("{} {}", msg, self.id);
+                            self.addr.do_send(server::ClientMessage {
+                                id: self.id,
+                                msg,
+                                room: self.room.clone(),
+                            })
                         }
-                        _ => ctx.text(format_m(&format!("!!! unknown command: {:?}", m))),
                     }
-                } else {
-                    let msg = if let Some(ref name) = self.name {
-                        format!("{}: {}", name, m)
-                    } else {
-                        m.to_owned()
-                    };
-                    log::info!("{} {}", msg, self.id);
-                    self.addr.do_send(server::ClientMessage {
-                        id: self.id,
-                        msg,
-                        room: self.room.clone(),
-                    })
                 }
             }
             ws::Message::Binary(_) => println!("Unexpected binary"),
