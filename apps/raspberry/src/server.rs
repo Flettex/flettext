@@ -56,6 +56,11 @@ pub struct ClientEvent {
     pub room: String,
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct LoginEvent {
+    pub test: usize,
+}
+
 #[derive(Message)]
 #[rtype(result = "()")]
 pub struct ClientMessage {

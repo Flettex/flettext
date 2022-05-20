@@ -1,6 +1,31 @@
 import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  log: [
+    {
+      emit: 'event',
+      level: 'query',
+    },
+    {
+      emit: 'stdout',
+      level: 'error',
+    },
+    {
+      emit: 'stdout',
+      level: 'info',
+    },
+    {
+      emit: 'stdout',
+      level: 'warn',
+    },
+  ],
+});
+
+prisma.$on('query', (e: any) => {
+  console.log('Query: ' + e.query)
+  console.log('Params: ' + e.params)
+  console.log('Duration: ' + e.duration + 'ms')
+});
 
 // PERMISSIONS:
 // *permissions is bitshift
@@ -25,6 +50,32 @@ async function main() {
     await prisma.$executeRaw`
       SELECT 'TEST';
     `;
+    const user = await prisma.user.create({
+      select: {
+        id: true
+      },
+      data: {
+        username: "a",
+        email: "bruh@gmail.com",
+        password: "1234",
+        avatarUrl: "1"
+      }
+    });
+    await prisma.user.update({
+      where: {
+        id: user.id
+      },
+      data: {
+        username: "b",
+        avatarUrl: null,
+        password: undefined
+      }
+    });
+    await prisma.user.delete({
+      where: {
+        id: user.id
+      }
+    });
     console.log(`Seeding finished.`);
 }
 

@@ -9,6 +9,8 @@ use serde::{Serialize, Deserialize};
 use serde_json::{json};
 use std::fmt;
 
+use sqlx::postgres::PgPool;
+
 fn format_m(content: &str) -> String {
     json!({
         "data": {
@@ -85,7 +87,9 @@ pub struct WsChatSession {
 
     pub authenticated: bool,
 
-    pub handle: Option<SpawnHandle>
+    pub handle: Option<SpawnHandle>,
+
+    pub pool: PgPool,
 }
 
 impl WsChatSession {

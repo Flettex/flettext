@@ -1,6 +1,6 @@
 // index.html file will not work in production if it doesn't exist... so I decided to include this in rust's BUILD.
 
-pub fn html_str() -> std::string::String {
+pub static HTML_STR: &str = 
     r#"
         <!DOCTYPE html>
         <html>
@@ -204,5 +204,4 @@ pub fn html_str() -> std::string::String {
             </script>
         </body>
         </html>
-    "#.to_owned()
-}
+    "#;
