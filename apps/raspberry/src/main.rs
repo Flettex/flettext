@@ -19,6 +19,7 @@ use sqlx::postgres::PgPool;
 mod server;
 mod html;
 mod session;
+mod db;
 
 async fn health_check() -> impl Responder {
     HttpResponse::Ok()
@@ -67,53 +68,66 @@ async fn get_count(count: web::Data<AtomicUsize>) -> impl Responder {
     format!("Visitors: {}", current_count)
 }
 
-async fn add_todo(pool: &PgPool, description: String) -> sqlx::Result<i64> {
-    let rec = sqlx::query!(
-        r#"
-INSERT INTO todos ( description )
-VALUES ( $1 )
-RETURNING id
-        "#,
-        description
-    )
-    .fetch_one(pool)
-    .await?;
+// async fn add_todo(pool: &PgPool, description: String) -> sqlx::Result<i64> {
+//     let rec = sqlx::query!(
+//         r#"
+// INSERT INTO todos ( description )
+// VALUES ( $1 )
+// RETURNING id
+//         "#,
+//         description
+//     )
+//     .fetch_one(pool)
+//     .await?;
 
-    Ok(rec.id)
-}
+//     Ok(rec.id)
+// }
 
-async fn list_todos(pool: &PgPool) -> sqlx::Result<()> {
-    let recs = sqlx::query!(
-        r#"
-SELECT id, description, done
-FROM todos
-ORDER BY id
-        "#
-    )
-    .fetch_all(pool)
-    .await?;
+// async fn list_todos(pool: &PgPool) -> sqlx::Result<()> {
+//     let recs = sqlx::query!(
+//         r#"
+// SELECT id, description, done
+// FROM todos
+// ORDER BY id
+//         "#
+//     )
+//     .fetch_all(pool)
+//     .await?;
 
-    for rec in recs {
-        println!(
-            "- [{}] {}: {}",
-            if rec.done { "x" } else { " " },
-            rec.id,
-            &rec.description,
-        );
-    }
+//     for rec in recs {
+//         println!(
+//             "- [{}] {}: {}",
+//             if rec.done { "x" } else { " " },
+//             rec.id,
+//             &rec.description,
+//         );
+//     }
 
-    Ok(())
-}
+//     Ok(())
+// }
 
 async fn login(
     body: web::Json<server::LoginEvent>,
     pool: web::Data<PgPool>
 ) -> impl Responder {
     println!("{}", body.into_inner().test);
-    add_todo(pool.as_ref(), "asdlfasf".to_string())
-        .await
-        .unwrap();
-    list_todos(pool.as_ref())
+    // add_todo(pool.as_ref(), "asdlfasf".to_string())
+    //     .await
+    //     .unwrap();
+    // list_todos(pool.as_ref())
+    //     .await
+    //     .unwrap();
+    HttpResponse::Ok()
+}
+
+async fn signup(
+    body: web::Json<server::SignUpEvent>,
+    pool: web::Data<PgPool>
+) -> impl Responder {
+    db::signup::add_user(
+        body.into_inner(),
+        pool.as_ref()
+    )
         .await
         .unwrap();
     HttpResponse::Ok()
@@ -146,6 +160,7 @@ async fn main() -> std::io::Result<()> {
             .route("/", web::get().to(index))
             .route("/", web::post().to(message_route))
             .route("/login", web::post().to(login))
+            .route("/signup", web::post().to(signup))
             .route("/count", web::get().to(get_count))
             .route("/ws", web::get().to(chat_route))
             .route("/healthcheck", web::get().to(health_check))

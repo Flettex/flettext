@@ -61,6 +61,13 @@ pub struct LoginEvent {
     pub test: usize,
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct SignUpEvent {
+    pub username: String,
+    pub email: String,
+    pub password: String,
+}
+
 #[derive(Message)]
 #[rtype(result = "()")]
 pub struct ClientMessage {
