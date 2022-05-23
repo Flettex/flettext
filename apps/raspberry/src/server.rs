@@ -58,7 +58,8 @@ pub struct ClientEvent {
 
 #[derive(Serialize, Deserialize)]
 pub struct LoginEvent {
-    pub test: usize,
+    pub email: String,
+    pub password: String
 }
 
 #[derive(Serialize, Deserialize)]
