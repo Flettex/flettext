@@ -111,9 +111,7 @@ impl ChatServer {
             visitor_count,
         }
     }
-}
 
-impl ChatServer {
     fn send_message(&self, room: &str, message: &str, skip_id: usize) {
         if let Some(sessions) = self.rooms.get(room) {
             for id in sessions {

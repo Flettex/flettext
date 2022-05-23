@@ -1,207 +1,227 @@
-// index.html file will not work in production if it doesn't exist... so I decided to include this in rust's BUILD.
+pub static DEFAULT_PAGE_HTML: &str = r#"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Not Found</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <p>Not found noob</p>
+</body>
+</html>
+"#;
 
-pub static HTML_STR: &str = 
-    r#"
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8" />
-            <title>Chat!</title>
+pub static HTML_STR: &str = r#"
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Chat!</title>
 
-            <style>
-            :root {
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-                Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-                font-size: 18px;
-            }
+    <style>
+      :root {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        font-size: 18px;
+      }
 
-            input[type='text'] {
-                font-size: inherit;
-            }
+      input[type='text'] {
+        font-size: inherit;
+      }
 
-            #log {
-                width: 30em;
-                height: 20em;
-                overflow: auto;
-                margin: 0.5em 0;
+      #log {
+        width: 30em;
+        height: 20em;
+        overflow: auto;
+        margin: 0.5em 0;
 
-                border: 1px solid black;
-            }
+        border: 1px solid black;
+      }
 
-            #status {
-                padding: 0 0.2em;
-            }
+      #status {
+        padding: 0 0.2em;
+      }
 
-            #text {
-                width: 17em;
-                padding: 0.5em;
-            }
+      #text {
+        width: 17em;
+        padding: 0.5em;
+      }
 
-            .msg {
-                margin: 0;
-                padding: 0.25em 0.5em;
-            }
+      .msg {
+        margin: 0;
+        padding: 0.25em 0.5em;
+      }
 
-            .msg--status {
-                /* a light yellow */
-                background-color: #ffffc9;
-            }
+      .msg--status {
+        /* a light yellow */
+        background-color: #ffffc9;
+      }
 
-            .msg--message {
-                /* a light blue */
-                background-color: #d2f4ff;
-            }
+      .msg--message {
+        /* a light blue */
+        background-color: #d2f4ff;
+      }
 
-            .msg--error {
-                background-color: pink;
-            }
-            </style>
-        </head>
+      .msg--error {
+        background-color: pink;
+      }
+    </style>
+  </head>
 
-        <body>
-            <h1>Chat!</h1>
+  <body>
+    <h1>Chat!</h1>
 
-            <div>
-            <!-- <button onclick="fetch('/', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({type: 'MessageCreate', client_id: 0, data: { content: 'Hello' }, room: 'Main'})})">Send Hi</button> -->
-            <button onclick="socket.send('hi')">Send Hi</button>
-            <button id="connect">Connect</button>
-            <span>Status:</span>
-            <span id="status">disconnected</span>
-            </div>
+    <div>
+      <!-- button onclick="fetch('/', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({type: 'MessageCreate', client_id: 0, data: { content: 'Hello' }, room: 'Main'})})">Send Hi</button -->
+      <button id="connect">Connect</button>
+      <span>Status:</span>
+      <span id="status">disconnected</span>
+    </div>
 
-            <div id="log"></div>
+    <div id="log"></div>
 
-            <form id="chatform">
-            <input type="text" id="text" />
-            <input type="submit" id="send" />
-            </form>
+    <form id="chatform">
+      <input type="text" id="text" />
+      <input type="submit" id="send" />
+    </form>
 
-            <hr />
+    <hr />
 
-            <section>
-            <h2>Commands</h2>
-            <table style="border-spacing: 0.5em">
-                <tr>
-                <td>
-                    <code>/list</code>
-                </td>
-                <td>list all available rooms</td>
-                </tr>
-                <tr>
-                <td>
-                    <code>/join name</code>
-                </td>
-                <td>join room, if room does not exist, create new one</td>
-                </tr>
-                <tr>
-                <td>
-                    <code>/name name</code>
-                </td>
-                <td>set session name</td>
-                </tr>
-                <tr>
-                <td>
-                    <code>some message</code>
-                </td>
-                <td>just string, send message to all peers in same room</td>
-                </tr>
-            </table>
-            </section>
+    <section>
+      <h2>Commands</h2>
+      <table style="border-spacing: 0.5em">
+        <tr>
+          <td>
+            <code>/list</code>
+          </td>
+          <td>list all available rooms</td>
+        </tr>
+        <tr>
+          <td>
+            <code>/join name</code>
+          </td>
+          <td>join room, if room does not exist, create new one</td>
+        </tr>
+        <tr>
+          <td>
+            <code>/name name</code>
+          </td>
+          <td>set session name</td>
+        </tr>
+        <tr>
+          <td>
+            <code>some message</code>
+          </td>
+          <td>just string, send message to all peers in same room</td>
+        </tr>
+      </table>
+    </section>
 
-            <script>
-            const $status = document.querySelector('#status')
-            const $connectButton = document.querySelector('#connect')
-            const $log = document.querySelector('#log')
-            const $form = document.querySelector('#chatform')
-            const $input = document.querySelector('#text')
+    <script>
+      const $status = document.querySelector('#status')
+      const $connectButton = document.querySelector('#connect')
+      const $log = document.querySelector('#log')
+      const $form = document.querySelector('#chatform')
+      const $input = document.querySelector('#text')
 
-            /** @type {WebSocket | null} */
-            var socket = null
+      /** @type {WebSocket | null} */
+      var socket = null
 
-            function log(msg, type = 'status') {
-                $log.innerHTML += `<p class="msg msg--${type}">${msg}</p>`
-                $log.scrollTop += 1000
-            }
+      function log(msg, type = 'status') {
+        $log.innerHTML += `<p class="msg msg--${type}">${msg}</p>`
+        $log.scrollTop += 1000
+      }
 
-            function connect() {
-                disconnect()
+      function connect() {
+        disconnect()
 
-                const { location } = window
+        const { location } = window
 
-                const proto = location.protocol.startsWith('https') ? 'wss' : 'ws'
-                const wsUri = `${proto}://${location.host}/ws`
+        const proto = location.protocol.startsWith('https') ? 'wss' : 'ws'
+        const wsUri = `${proto}://${location.host}/ws`
 
-                log('Connecting...')
-                socket = new WebSocket(wsUri)
+        log('Connecting...')
+        socket = new WebSocket(wsUri)
 
-                socket.onopen = () => {
-                    log('Connected')
-                    updateConnectionStatus()
-                }
+        socket.onopen = () => {
+          log('Connected')
+          updateConnectionStatus()
+        }
 
-                socket.onmessage = (ev) => {
-                    console.log(ev);
-                    const event = JSON.parse(ev.data);
-                    log('Received: ' + event.data.content, 'message')
-                }
+        socket.onmessage = (ev) => {
+          console.log(ev);
+          const event = JSON.parse(ev.data);
+          log('Received: ' + event.data.content, 'message')
+        }
 
-                socket.onclose = (ev) => {
-                    log('Disconnected')
-                    socket = null
-                    console.log(ev.code, ev.reason)
-                    updateConnectionStatus()
-                }
-            }
+        socket.onclose = () => {
+          log('Disconnected')
+          socket = null
+          updateConnectionStatus()
+        }
+      }
 
-            function disconnect() {
-                if (socket) {
-                    log('Disconnecting...')
-                    socket.close()
-                    socket = null
+      function disconnect() {
+        if (socket) {
+          log('Disconnecting...')
+          socket.close()
+          socket = null
 
-                    updateConnectionStatus()
-                }
-            }
+          updateConnectionStatus()
+        }
+      }
 
-            function updateConnectionStatus() {
-                if (socket) {
-                    $status.style.backgroundColor = 'transparent'
-                    $status.style.color = 'green'
-                    $status.textContent = `connected`
-                    $connectButton.innerHTML = 'Disconnect'
-                    $input.focus()
-                    } else {
-                    $status.style.backgroundColor = 'red'
-                    $status.style.color = 'white'
-                    $status.textContent = 'disconnected'
-                    $connectButton.textContent = 'Connect'
-                }
-            }
+      function updateConnectionStatus() {
+        if (socket) {
+          $status.style.backgroundColor = 'transparent'
+          $status.style.color = 'green'
+          $status.textContent = `connected`
+          $connectButton.innerHTML = 'Disconnect'
+          $input.focus()
+        } else {
+          $status.style.backgroundColor = 'red'
+          $status.style.color = 'white'
+          $status.textContent = 'disconnected'
+          $connectButton.textContent = 'Connect'
+        }
+      }
 
-            $connectButton.addEventListener('click', () => {
-                if (socket) {
-                    disconnect()
-                } else {
-                    connect()
-                }
+      $connectButton.addEventListener('click', () => {
+        if (socket) {
+          disconnect()
+        } else {
+          connect()
+        }
 
-                updateConnectionStatus()
-            })
+        updateConnectionStatus()
+      })
 
-            $form.addEventListener('submit', (ev) => {
-                ev.preventDefault()
+      $form.addEventListener('submit', (ev) => {
+        ev.preventDefault()
 
-                const text = $input.value
+        const text = $input.value
 
-                log('Sending: ' + text)
-                socket.send(text)
+        log('Sending: ' + text)
+        socket.send(text)
 
-                $input.value = ''
-                $input.focus()
-            })
+        $input.value = ''
+        $input.focus()
+      })
 
-            updateConnectionStatus()
-            </script>
-        </body>
-        </html>
-    "#;
+      updateConnectionStatus()
+    </script>
+  </body>
+</html>
+"#;

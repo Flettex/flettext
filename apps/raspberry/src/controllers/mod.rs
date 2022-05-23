@@ -4,12 +4,13 @@ use actix_web::{
     HttpResponse
 };
 
-mod login;
-mod logout;
-mod signup;
-mod index;
-mod ws;
-mod count;
+pub mod login;
+pub mod logout;
+pub mod signup;
+pub mod index;
+pub mod ws;
+pub mod count;
+pub mod default;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -31,6 +32,9 @@ pub fn config(cfg: &mut web::ServiceConfig) {
                 .route(web::post().to(signup::post)),
             web::resource("/logout")
                 .route(web::delete().to(logout::delete)),
+            // default page
+            web::scope("")
+                .default_service(web::to(default::all))
         ]
     );
 }

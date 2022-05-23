@@ -12,11 +12,8 @@ use actix_web::{
     web,
     App,
     HttpServer,
-    HttpRequest,
-    HttpResponse,
     middleware::Logger,
     cookie::SameSite,
-    http::{StatusCode, header::ContentType}
 };
 
 use sqlx::postgres::PgPool;
@@ -26,16 +23,7 @@ mod db;
 mod html;
 mod server;
 mod session;
-
-async fn default_page(req: HttpRequest) -> HttpResponse {
-    if req.method() == "GET" {
-        HttpResponse::build(StatusCode::NOT_FOUND)
-            .content_type(ContentType::html())
-            .body("")
-    } else {
-        HttpResponse::NotFound().finish()
-    }
-}
+mod test;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -80,7 +68,6 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(pool.clone()))
             .app_data(web::Data::new(server.clone()))
             .configure(controllers::config)
-            .default_service(web::to(default_page))
             .wrap(IdentityService::new(policy))
             .wrap(Logger::default())
     })
