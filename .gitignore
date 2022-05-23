@@ -5,8 +5,6 @@ raspberry-backend-app.exe
 raspberry-backend-app.d
 raspberry-backend-app.pdb
 
-raspberry_cached
-
 # dependencies
 node_modules
 .pnp
