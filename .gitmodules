@@ -1,0 +1,3 @@
+[submodule "apps/raspberry"]
+	path = apps/raspberry
+	url = https://github.com/Flettex/raspberry.git
