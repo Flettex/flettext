@@ -1,3 +1,7 @@
 [submodule "apps/raspberry"]
 	path = apps/raspberry
 	url = https://github.com/Flettex/raspberry.git
+
+[submodule "apps/pineapple"]
+	path = apps/pineapple
+	url = https://github.com/Flettex/pineapple.git
