@@ -44,17 +44,18 @@ export const Button = styled('button', {
     }
 });
 
+const ButtonGroupInner = styled(Box, {
+    backgroundColor: 'rgb(230, 230, 230)',
+    borderRadius: '5px',
+    display: 'flex',
+    width: 'fit-content',
+    height: 'fit-content'
+});
+
 export const ButtonGroup = (props: IButtonGroupProps) => {
     const [focusIndex, setFocusIndex] = useState<number>(props.focusIndex ?? 0);
     return (
-        <Box css={{
-            backgroundColor: 'rgb(230, 230, 230)',
-            borderRadius: '5px',
-            display: 'flex',
-            width: 'fit-content',
-            height: 'fit-content',
-            ...props.css
-        }}>
+        <ButtonGroupInner>
             {props.children.map((child, index) => (
                     <Box
                         css={{
@@ -78,6 +79,6 @@ export const ButtonGroup = (props: IButtonGroupProps) => {
                     </Box>
                 )
             )}
-        </Box>
+        </ButtonGroupInner>
     )
 }
