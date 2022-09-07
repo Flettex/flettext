@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 
 //(props: InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Signup() {
+export default function Verify() {
     const Router = useRouter();
     function gebi(id: string): HTMLInputElement {
         return document.getElementById(id) as HTMLInputElement;
@@ -12,14 +12,15 @@ export default function Signup() {
         <>
             <input id="i" type="number" />
             <button onClick={() =>
-                fetch("/verify", {
+                fetch("/api/verify", {
                     method: "POST",
                     headers: {
                         'Content-Type': "application/json"
                     },
                     body: JSON.stringify({
                         code: parseInt(gebi("i").value)
-                    })
+                    }),
+                    credentials: 'include'
                 }).then((res) => {
                     if (res.ok) Router.push("/chat");
                 })

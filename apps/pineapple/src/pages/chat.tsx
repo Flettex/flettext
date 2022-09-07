@@ -358,7 +358,7 @@ export default function Chat() {
 		}
 	}, [logs]);
 
-	function connect(): void {
+	async function connect() {
 		if (socket) {
 			if (disconnecting) {
 				alert("Be patient I'm tryna disconnect");
@@ -370,8 +370,10 @@ export default function Chat() {
 		} else {
 			const { location } = window;
 
+			// await fetch("/api/samesite");
 			const proto = location.protocol.startsWith("https") ? "wss" : "ws";
-			const wsUri = `${proto}://localhost:8080/ws`;
+			// const wsUri = `${proto}://localhost:8080/ws`;
+			const wsUri = `${proto}://flettex-backend.fly.dev/ws`;
 
 			log(sysmsg("Connecting...", channel.id));
 			let websocket = new WebSocket(wsUri);
@@ -506,7 +508,7 @@ export default function Chat() {
 							type: "MessageCreate",
 							data: {
 								content: text,
-								channel_id: uuid.parse(channel.id),
+								channel_id: channel.id,
 								nonce: uuid.parse(nonce)
 							},
 						})

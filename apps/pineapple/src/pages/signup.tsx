@@ -5,7 +5,9 @@ import useSWR from 'swr';
 
 //(props: InferGetServerSidePropsType<typeof getServerSideProps>
 
-const fetcher = (url: string) => fetch(url).then(r => r.text());
+const fetcher = (url: string) => fetch(url, {
+    credentials: 'include'
+}).then(r => r.text());
 
 export default function Signup() {
     const { data } = useSWR("/api/signup", fetcher);
@@ -17,7 +19,7 @@ export default function Signup() {
         <>
             <form id="frm" onSubmit={(e) => {
                 e.preventDefault();
-                fetch("/signup", {
+                fetch("/api/signup", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -27,7 +29,8 @@ export default function Signup() {
                         email: gebi("e").value,
                         password: gebi("p").value,
                         code: gebi("captcha").value
-                    })
+                    }),
+                    credentials: 'include'
                 }).then((res) => {
                     if (res.ok) {
                         Router.push("/verify");

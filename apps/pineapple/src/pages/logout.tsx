@@ -4,6 +4,7 @@ export default function Logout() {
         <button onClick={() => {
             fetch("/api/logout", {
                 method: "DELETE",
+                credentials: 'include'
             }).then((res) => alert(res.status));
         }}>Logout</button>
     )

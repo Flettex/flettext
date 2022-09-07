@@ -5,7 +5,9 @@ import useSWR from 'swr';
 
 //(props: InferGetServerSidePropsType<typeof getServerSideProps>
 
-const fetcher = (url: string) => fetch(url).then(r => r.text());
+const fetcher = (url: string) => fetch(url, {
+    credentials: 'include'
+}).then(r => r.text());
 
 export default function Login() {
     const { data } = useSWR("/api/login", fetcher);
@@ -26,7 +28,8 @@ export default function Login() {
                         email: gebi("e")?.value,
                         password: gebi("p")?.value,
                         code: gebi("captcha")?.value
-                    })
+                    }),
+                    credentials: 'include'
                 }).then((res) => {
                     if (res.ok) {
                         Router.push("/chat");
