@@ -61,5 +61,5 @@ dist
 .vercel
 
 # no more
-durian
-pineapple_legacy
+durian/
+pineapple_legacy/
