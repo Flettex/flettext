@@ -59,3 +59,7 @@ yarn-error.log*
 
 dist
 .vercel
+
+# no more
+durian
+pineapple_legacy
