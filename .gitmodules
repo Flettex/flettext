@@ -5,3 +5,7 @@
 [submodule "apps/pineapple"]
 	path = apps/pineapple
 	url = https://github.com/Flettex/pineapple.git
+
+[submodule "apps/pineapple-svelte"]
+	path = apps/pineapple-svelte
+	url = https://github.com/Flettex/pineapple-svelte.git
