@@ -1,0 +1,6 @@
+[workspace]
+
+members = [
+    "packages/raspberry_macros",
+    "apps/raspberry"
+]
