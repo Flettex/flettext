@@ -2,6 +2,13 @@
 name = "raspberry_macros"
 version = "0.1.0"
 edition = "2021"
+description = "Macros for raspberry app"
+authors = ["CapitalismD"]
+readme = "../../README.md"
+repository = "https://github.com/Flettex/flettex-chat"
+license = "MIT OR Apache-2.0"
+keywords = ["raspberry"]
+categories = ["web-programming"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -12,4 +19,3 @@ proc_macro = true
 syn = {version = "1", features = ["full", "extra-traits"] }
 quote = "1"
 proc-macro2 = "1"
-# prettyplease = "0.1"
