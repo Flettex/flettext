@@ -3,10 +3,18 @@
 </p>
 <h1 align="center"> Flettext </h1>
 
+## Git submodules
+
+Flettex/flettext is a monorepo.
+
+The individual components of the project are found here:
+- Frontend: [https://github.com/Flettex/pineapple-svelte](https://github.com/Flettex/pineapple-svelte)
+- Backend: [https://github.com/Flettex/raspberry](https://github.com/Flettex/raspberry)
+- Frontend (legacy): [https://github.com/Flettex/pineapple](https://github.com/Flettex/pineapple)
+
 ## Overview
 
 Flettext is an extensive real-time instant messaging application designed to connect people from all over the world. Provided features include guilds (container of channels), channels (container of messages), etc. You may create a guild to talk with a group of friends, or just directly message your friend. There is also a global chat where you can make new friends!
-
 
 ## Why this project was made
 
